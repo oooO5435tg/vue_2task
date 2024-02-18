@@ -76,6 +76,49 @@ new Vue({
                 this.newList.push({ title: '', id: getUniqueId('newListItem') });
             }
         },
+        autoMoveTask(taskIndex, column) {
+            const task = column === 'planned' ? this.plannedTasks[taskIndex] : this.progressTasks[taskIndex];
+            if (task === undefined) {
+                return;
+            }
+            const completedListItemsCount = task.completedListItems.filter(Boolean).length;
+            const totalListItemsCount = task.lists.length;
+            const percentageCompleted = (completedListItemsCount / totalListItemsCount) * 100;
+
+            if (percentageCompleted === 100) {
+                if (column === 'planned') {
+                    this.completedTasks.push(this.plannedTasks.splice(taskIndex, 1)[0]);
+                    // Устанавливаем дату и время последнего отмеченного пункта
+                    task.lastCompletedAt = new Date().toLocaleString();
+                } else {
+                    this.completedTasks.push(this.progressTasks.splice(taskIndex, 1)[0]);
+                    // Устанавливаем дату и время последнего отмеченного пункта
+                    task.lastCompletedAt = new Date().toLocaleString();
+                }
+            }
+            else if (percentageCompleted >= 50) {
+                if (column === 'planned') {
+                    if (this.progressTasks.length >= 5){
+                        alert('Нельзя добавить более 5-ти карточек во второй список');
+                        // Блокируем редактирование первого столбца
+                        this.editedTask = null;
+                        this.editedTaskIndex = null;
+                        this.editedColumn = null;
+                    }
+                    else{
+                        this.progressTasks.push(this.plannedTasks.splice(taskIndex, 1)[0]);
+                        // Проверяем, если удаляется карточка из первого столбца и он содержит задачи с процентом выполнения >= 50
+                        if (this.plannedTasks.some(task => task.percentageCompleted >= 50)) {
+                            this.progressTasks.unshift(this.plannedTasks.shift()); // Переносим первую задачу из первого столбца во второй
+                            // Блокируем редактирование первого столбца
+                            this.editedTask = null;
+                            this.editedTaskIndex = null;
+                            this.editedColumn = null;
+                        }
+                    }
+                }
+            }
+        },
         saveData() {
             const data = {
                 plannedTasks: this.plannedTasks,
@@ -85,7 +128,37 @@ new Vue({
             localStorage.setItem(storageKey, JSON.stringify(data));
         },
     },
+    computed: {
+        // Вычисляемое свойство для отслеживания изменений во всех задачах в массиве plannedTasks
+        plannedTasksWatcher() {
+            return this.plannedTasks.map((task, index) => {
+                return task.completedListItems.reduce((acc, val) => acc + (val ? 1 : 0), 0);
+            });
+        },
+        // Вычисляемое свойство для отслеживания изменений во всех задачах в массиве progressTasks
+        progressTasksWatcher() {
+            return this.progressTasks.map((task, index) => {
+                return task.completedListItems.reduce((acc, val) => acc + (val ? 1 : 0), 0);
+            });
+        }
+    },
     watch: {
+        plannedTasksWatcher: {
+            deep: true,
+            handler(newVal, oldVal) {
+                newVal.forEach((count, index) => {
+                    this.autoMoveTask(index, 'planned');
+                });
+            }
+        },
+        progressTasksWatcher: {
+            deep: true,
+            handler(newVal, oldVal) {
+                newVal.forEach((count, index) => {
+                    this.autoMoveTask(index, 'progress');
+                });
+            }
+        },
         plannedTasks: {
             handler(newPlannedTasks) {
                 this.saveData();
