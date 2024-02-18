@@ -19,7 +19,7 @@
                 <label for="listItemTitle">Список {{ index + 1 }}:</label>
                 <input id="listItemTitle" type="text" v-model="newList[index].title">
             </div>
-            <button type="button">Добавить список</button>
+            <button type="button" @click="addListItem">Добавить список</button>
             <button type="submit">Добавить задачу</button>
         </form>
     </div>

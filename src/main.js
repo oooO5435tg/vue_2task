@@ -22,6 +22,23 @@ new Vue({
     },
     methods: {
         addTask() {
+            if (!this.newTask.title) {
+                alert('Необходимо указать заголовок задачи');
+                return;
+            }
+            if (!this.newTask.title || this.newList.some(listItem => !listItem.title)) {
+                alert('Необходимо заполнить все списки');
+                return;
+            }
+            if (this.newList.length < 3 || this.newList.length > 5) {
+                alert('Количество списков должно быть в диапазоне от 3 до 5');
+                return;
+            }
+            if (this.plannedTasks.length >= 3) {
+                alert('Нельзя добавить более 3-х карточек в первый список');
+                return;
+            }
+
             const newListItems = this.newList.map((listItem, index) => ({
                 ...listItem,
                 id: getUniqueId(`listItem-${this.newList.length}`),
@@ -31,21 +48,23 @@ new Vue({
             this.plannedTasks.push({
                 ...this.newTask,
                 lists: newListItems,
-                completedListItems: newListItems.map(item => item.completed), // Initialize completedListItems based on completed property
-                createdAt: new Date().toLocaleString(),
-                lastChange: null
+                completedListItems: newListItems.map(item => item.completed),
             });
 
             this.newTask = {
                 title: '',
-                description: '',
-                deadline: '',
-                createdAt: '',
-                lastChange: null
             };
             this.newList = [
                 { title: '', id: getUniqueId('newListItem') }
             ];
+        },
+        removeTask(taskIndex) {
+            this.plannedTasks.splice(taskIndex, 1);
+        },
+        addListItem() {
+            if (this.newList.length < 5) {
+                this.newList.push({ title: '', id: getUniqueId('newListItem') });
+            }
         },
     }
 })
