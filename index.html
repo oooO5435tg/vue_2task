@@ -9,8 +9,57 @@
     <title>To Do</title>
 </head>
 <body>
-    <div id="app">
-
+<div id="app">
+    <div class="addForm">
+        <form @submit.prevent="">
+            <h2>Форма добавления задачи</h2>
+            <label for="title">Заголовок карточки:</label>
+            <input id="title" type="text" v-model="newTask.title">
+            <div>
+                <label for="listItemTitle">Список:</label>
+                <input id="listItemTitle" type="text">
+            </div>
+            <button type="button">Добавить список</button>
+            <button type="submit">Добавить задачу</button>
+        </form>
     </div>
+    <div class="column">
+        <h2>Создана</h2>
+        <div class="card">
+            <div>
+                <ul>
+                    <li>
+                        <input type="checkbox" :id="listItem">
+                        <label :for="listItem">Список:</label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <h2>В работе</h2>
+        <div class="card">
+            <div>
+                <ul>
+                    <li>
+                        <input type="checkbox" :id="listItem">
+                        <label :for="listItem">Список:</label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <h2>Готова</h2>
+        <div class="card">
+            <div>
+                <ul>
+                    <li>Список:</li>
+                </ul>
+                <p>Последний пункт был отмечен:</p>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
