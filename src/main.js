@@ -30,7 +30,7 @@ new Vue({
             editedColumn: null,
         }
     },
-    methods: {
+    methods:{
         addTask() {
             if (!this.newTask.title) {
                 alert('Необходимо указать заголовок задачи');
@@ -58,7 +58,7 @@ new Vue({
             this.plannedTasks.push({
                 ...this.newTask,
                 lists: newListItems,
-                completedListItems: newListItems.map(item => item.completed),
+                completedListItems: newListItems.map(item => item.completed), // Initialize completedListItems based on completed property
             });
 
             this.newTask = {
@@ -115,6 +115,16 @@ new Vue({
                             this.editedTaskIndex = null;
                             this.editedColumn = null;
                         }
+                    }
+                }
+            }
+            else if (percentageCompleted < 50) {
+                if (column === 'progress') {
+                    if (this.plannedTasks.length < 3) {
+                        this.plannedTasks.push(this.progressTasks.splice(taskIndex, 1)[0]);
+                    }
+                    else {
+                        alert("В 1 столбце уже есть 3 карточки!");
                     }
                 }
             }
