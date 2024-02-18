@@ -1,3 +1,13 @@
+const storageKey = 'new';
+
+const storageData = localStorage.getItem(storageKey);
+
+const initialData = storageData ? JSON.parse(storageData) : {
+    plannedTasks: [],
+    progressTasks: [],
+    completedTasks: []
+};
+
 function getUniqueId(prefix) {
     return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 }
@@ -12,9 +22,9 @@ new Vue({
             newList: [
                 { title: '', id: getUniqueId('newListItem') }
             ],
-            plannedTasks: [],
-            progressTasks: [],
-            completedTasks: [],
+            plannedTasks: initialData.plannedTasks,
+            progressTasks: initialData.progressTasks,
+            completedTasks: initialData.completedTasks,
             editedTask: null,
             editedTaskIndex: null,
             editedColumn: null,
@@ -66,5 +76,33 @@ new Vue({
                 this.newList.push({ title: '', id: getUniqueId('newListItem') });
             }
         },
+        saveData() {
+            const data = {
+                plannedTasks: this.plannedTasks,
+                progressTasks: this.progressTasks,
+                completedTasks: this.completedTasks
+            };
+            localStorage.setItem(storageKey, JSON.stringify(data));
+        },
+    },
+    watch: {
+        plannedTasks: {
+            handler(newPlannedTasks) {
+                this.saveData();
+            },
+            deep: true
+        },
+        progressTasks: {
+            handler(newProgressTasks) {
+                this.saveData();
+            },
+            deep: true
+        },
+        completedTasks: {
+            handler(newCompletedTasks) {
+                this.saveData();
+            },
+            deep: true
+        }
     }
 })
