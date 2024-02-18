@@ -11,13 +11,13 @@
 <body>
 <div id="app">
     <div class="addForm">
-        <form @submit.prevent="">
+        <form @submit.prevent="addTask">
             <h2>Форма добавления задачи</h2>
             <label for="title">Заголовок карточки:</label>
             <input id="title" type="text" v-model="newTask.title">
-            <div>
-                <label for="listItemTitle">Список:</label>
-                <input id="listItemTitle" type="text">
+            <div v-for="(listItem, index) in newList" :key="index">
+                <label for="listItemTitle">Список {{ index + 1 }}:</label>
+                <input id="listItemTitle" type="text" v-model="newList[index].title">
             </div>
             <button type="button">Добавить список</button>
             <button type="submit">Добавить задачу</button>
@@ -25,25 +25,28 @@
     </div>
     <div class="column">
         <h2>Создана</h2>
-        <div class="card">
+        <div v-for="(task, index) in plannedTasks" :key="index">
             <div>
+                <h3>{{ task.title }}</h3>
                 <ul>
-                    <li>
-                        <input type="checkbox" :id="listItem">
-                        <label :for="listItem">Список:</label>
+                    <li v-for="(listItem, listItemIndex) in task.lists" :key="listItemIndex">
+                        <input type="checkbox" :id="'listItem-' + task.index + '-' + listItemIndex" :value="listItem.title" v-model="task.completedListItems[listItemIndex]">
+                        <label :for="'listItem-' + task.index + '-' + listItemIndex">{{ listItem.title }}</label>
                     </li>
                 </ul>
             </div>
+            <button class="delete-button" @click="removeTask(index)">Удалить</button>
         </div>
     </div>
     <div class="column">
         <h2>В работе</h2>
-        <div class="card">
+        <div v-for="(task, index) in progressTasks" :key="index">
             <div>
+                <h3>{{ task.title }}</h3>
                 <ul>
-                    <li>
-                        <input type="checkbox" :id="listItem">
-                        <label :for="listItem">Список:</label>
+                    <li v-for="(listItem, listItemIndex) in task.lists" :key="listItemIndex">
+                        <input type="checkbox" :id="'listItem-' + task.index + '-' + listItemIndex" :value="listItem.title" v-model="task.completedListItems[listItemIndex]">
+                        <label :for="'listItem-' + task.index + '-' + listItemIndex">{{ listItem.title }}</label>
                     </li>
                 </ul>
             </div>
@@ -51,12 +54,13 @@
     </div>
     <div class="column">
         <h2>Готова</h2>
-        <div class="card">
+        <div v-for="(task, index) in completedTasks" :key="index">
             <div>
+                <h3>{{ task.title }}</h3>
                 <ul>
-                    <li>Список:</li>
+                    <li v-for="(listItem, index) in task.lists" :key="index">{{ listItem.title }}</li>
                 </ul>
-                <p>Последний пункт был отмечен:</p>
+                <p>Последний пункт был отмечен: {{ task.lastCompletedAt }}</p>
             </div>
         </div>
     </div>
