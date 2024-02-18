@@ -27,7 +27,7 @@
     <div class="column">
         <h2>Создана</h2>
         <div v-for="(task, index) in plannedTasks" :key="index">
-            <div>
+            <div class="card">
                 <h3>{{ task.title }}</h3>
                 <ul>
                     <li v-for="(listItem, listItemIndex) in task.lists" :key="listItemIndex">
@@ -42,7 +42,7 @@
     <div class="column">
         <h2>В работе</h2>
         <div v-for="(task, index) in progressTasks" :key="index">
-            <div>
+            <div class="card">
                 <h3>{{ task.title }}</h3>
                 <ul>
                     <li v-for="(listItem, listItemIndex) in task.lists" :key="listItemIndex">
@@ -56,12 +56,12 @@
     <div class="column">
         <h2>Готова</h2>
         <div v-for="(task, index) in completedTasks" :key="index">
-            <div>
+            <div class="card">
                 <h3>{{ task.title }}</h3>
                 <ul>
                     <li v-for="(listItem, index) in task.lists" :key="index">{{ listItem.title }}</li>
                 </ul>
-                <p>Последний пункт был отмечен: {{ task.lastCompletedAt }}</p>
+                <p class="lastCheckbox">Последний пункт был отмечен: {{ task.lastCompletedAt }}</p>
             </div>
         </div>
     </div>
