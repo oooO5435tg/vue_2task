@@ -3,36 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
     <script defer src="src/vue.js"></script>
     <script defer src="src/main.js"></script>
-    <title>To Do</title>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Notes</title>
 </head>
 <body>
 <h1>Хранение заметок</h1>
-<div id="app">
+<div id="app" :class="{ 'disabled': plannedTasksLock }">
     <div class="addForm">
-        <form @submit.prevent="addTask">
+        <form @submit.prevent="addCard">
             <h2>Форма добавления задачи</h2>
-            <label for="title">Заголовок карточки:</label>
-            <input id="title" type="text" v-model="newTask.title">
-            <div v-for="(listItem, index) in newList" :key="index">
-                <label for="listItemTitle">Список {{ index + 1 }}:</label>
-                <input id="listItemTitle" type="text" v-model="newList[index].title">
-            </div>
-            <button type="button" @click="addListItem">Добавить список</button>
-            <button type="submit">Добавить задачу</button>
+            <input type="text" v-model="newCardTitle" placeholder="Заголовок карточки" :disabled="progressTasksFull">
+            <input v-for="(item, index) in newCardItems" type="text" v-model="item.text" :placeholder="'Список ' + (index + 1)" :disabled="progressTasksFull">
+            <button type="submit" :disabled="progressTasksFull">Добавить задачу</button>
         </form>
     </div>
-    <div class="column">
+    <div class="column" :disabled="progressTasksFull">
         <h2>Создана</h2>
-        <div v-for="(task, index) in plannedTasks" :key="index">
+        <div v-for="(card, index) in plannedTasks" :key="index" :class="{'disabled': progressTasksFull}">
             <div class="card">
-                <h3>{{ task.title }}</h3>
+                <h3>{{ card.title }}</h3>
                 <ul>
-                    <li v-for="(listItem, listItemIndex) in task.lists" :key="listItemIndex">
-                        <input type="checkbox" :id="'listItem-' + task.index + '-' + listItemIndex" :value="listItem.title" v-model="task.completedListItems[listItemIndex]">
-                        <label :for="'listItem-' + task.index + '-' + listItemIndex">{{ listItem.title }}</label>
+                    <li v-for="(item, i) in card.items" :key="i">
+                        <input type="checkbox" v-model="item.checked" :disabled="plannedTasksLock" @change="checkItem(card)">
+                        <input type="text" v-model="item.text" :disabled="plannedTasksLock" @change="updateItemText(card, item, $event.target.value)">
                     </li>
                 </ul>
             </div>
@@ -41,13 +36,13 @@
     </div>
     <div class="column">
         <h2>В работе</h2>
-        <div v-for="(task, index) in progressTasks" :key="index">
+        <div v-for="(card, index) in progressTasks" :key="index">
             <div class="card">
-                <h3>{{ task.title }}</h3>
+                <h3>{{ card.title }}</h3>
                 <ul>
-                    <li v-for="(listItem, listItemIndex) in task.lists" :key="listItemIndex">
-                        <input type="checkbox" :id="'listItem-' + task.index + '-' + listItemIndex" :value="listItem.title" v-model="task.completedListItems[listItemIndex]">
-                        <label :for="'listItem-' + task.index + '-' + listItemIndex">{{ listItem.title }}</label>
+                    <li v-for="(item, i) in card.items" :key="i">
+                        <input type="checkbox" v-model="item.checked" :disabled="plannedTasksLock" @change="checkItem(card)">
+                        <label>{{ item.text }}</label>
                     </li>
                 </ul>
             </div>
@@ -55,13 +50,15 @@
     </div>
     <div class="column">
         <h2>Готова</h2>
-        <div v-for="(task, index) in completedTasks" :key="index">
+        <div v-for="(card, index) in completedTasks" :key="index">
             <div class="card">
-                <h3>{{ task.title }}</h3>
+                <h3>{{ card.title }}</h3>
                 <ul>
-                    <li v-for="(listItem, index) in task.lists" :key="index">{{ listItem.title }}</li>
+                    <li v-for="(item, i) in card.items" :key="i">
+                        {{ item.text }}
+                    </li>
                 </ul>
-                <p class="lastCheckbox">Последний пункт был отмечен: {{ task.lastCompletedAt }}</p>
+                <p v-if="card.completed" class="lastCheckbox">Дата и время последнего выполнения: {{ card.lastCompleted }}</p>
             </div>
         </div>
     </div>
