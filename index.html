@@ -14,7 +14,7 @@
     <div class="addForm">
         <form @submit.prevent="addCard">
             <h2>Форма добавления задачи</h2>
-            <input type="text" v-model="newCardTitle" placeholder="Заголовок карточки" :disabled="progressTasksFull">
+            <input type="text" v-model="newCardTitle" placeholder="Заголовок задачи" :disabled="progressTasksFull">
             <input v-for="(item, index) in newCardItems" type="text" v-model="item.text" :placeholder="'Список ' + (index + 1)" :disabled="progressTasksFull">
             <button type="submit" :disabled="progressTasksFull">Добавить задачу</button>
         </form>
@@ -27,7 +27,7 @@
                 <ul>
                     <li v-for="(item, i) in card.items" :key="i">
                         <input type="checkbox" v-model="item.checked" :disabled="plannedTasksLock" @change="checkItem(card)">
-                        <input type="text" v-model="item.text" :disabled="plannedTasksLock" @change="updateItemText(card, item, $event.target.value)">
+                        <input type="text" v-model="item.text" :disabled="plannedTasksLock" @change="updateItem(card, item, $event.target.value)">
                     </li>
                 </ul>
             </div>
@@ -58,7 +58,7 @@
                         {{ item.text }}
                     </li>
                 </ul>
-                <p v-if="card.completed" class="lastCheckbox">Дата и время последнего выполнения: {{ card.lastCompleted }}</p>
+                <p v-if="card.completed" class="lastCheckbox">Дата последнего редактирования: {{ card.lastCompleted }}</p>
             </div>
         </div>
     </div>

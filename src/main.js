@@ -1,7 +1,5 @@
-const storageKey = 'new'; // Убедитесь, что ключ соответствует вашему хранилищу
-
+const storageKey = 'new';
 const storageData = localStorage.getItem(storageKey);
-
 const initialData = storageData ? JSON.parse(storageData) : {
     plannedTasks: [],
     progressTasks: [],
@@ -41,17 +39,11 @@ new Vue({
                         items: filledItems
                     });
                 } else {
-                    alert("Нельзя добавить более 3 карточек в первый список");
+                    alert("Нельзя добавить более 3 карточек в 1 столбец");
                     return;
                 }
                 this.newCardTitle = '';
-                this.newCardItems = [
-                    { text: '' },
-                    { text: '' },
-                    { text: '' },
-                    { text: '' },
-                    { text: '' }
-                ];
+                this.newCardItems = [{ text: '' }, { text: '' }, { text: '' }, { text: '' }, { text: '' }];
                 if (this.progressTasks.length < 5) {
                     this.plannedTasksLock = false;
                 }
@@ -62,7 +54,7 @@ new Vue({
         },
         checkItem(card) {
             if (this.plannedTasksLock) {
-                return; // Если столбик заблокан, то уже се
+                return;
             }
             this.progressTasksFull = false;
             const checkedCount = card.items.filter(item => item.checked).length;
