@@ -15,7 +15,8 @@ new Vue({
         newCardTitle: '',
         newCardItems: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }, { text: '' }],
         column1Locked: false,
-        column2Full1: false
+        column2Full1: false,
+        column2Locked: false,
     },
     // mounted() {
     //     if (localStorage.getItem('notes')) {
@@ -111,7 +112,7 @@ new Vue({
                 }
             }
             if (completionPercentage < 50 && this.progressTasks.includes(card) && this.plannedTasks.length < 3){
-                const index1 = this.column2.indexOf(card);
+                const index1 = this.progressTasks.indexOf(card);
                 this.progressTasks.splice(index1, 1);
                 this.plannedTasks.push(card);
             }
@@ -134,6 +135,12 @@ new Vue({
                 const index = this.completedTasks.indexOf(card);
                 this.completedTasks.splice(index, 1);
                 this.progressTasks.push(card);
+            }
+
+            //доп начало
+            if (completionPercentage < 50 && this.progressTasks.includes(card) && this.plannedTasks.length === 3) {
+                alert("AAAAAAAA");
+                this.column2Locked = true;
             }
         },
         moveCardToSecondColumn(card) {

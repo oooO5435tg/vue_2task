@@ -28,7 +28,7 @@
             </ul>
         </div>
     </div>
-    <div class="column">
+    <div class="column" :class="{'disabled': column2Locked}">
         <h2>В работе</h2>
         <div v-for="(card, index) in progressTasks" :key="index" class="card">
             <h3>{{ card.title }}</h3>
