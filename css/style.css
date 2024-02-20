@@ -4,6 +4,10 @@ body {
     padding: 0;
 }
 
+body h1{
+    margin: 20px 40px;
+}
+
 #app {
     display: flex;
     justify-content: space-around;
