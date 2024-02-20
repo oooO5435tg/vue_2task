@@ -12,11 +12,21 @@ new Vue({
         plannedTasks: initialData.plannedTasks,
         progressTasks: initialData.progressTasks,
         completedTasks: initialData.completedTasks,
-        plannedTasksLock: false,
-        progressTasksFull: false,
         newCardTitle: '',
         newCardItems: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }, { text: '' }],
+        column1Locked: false,
+        column2Full1: false
     },
+    // mounted() {
+    //     if (localStorage.getItem('notes')) {
+    //         const savedData = JSON.parse(localStorage.getItem('notes'));
+    //         this.column1 = savedData.column1;
+    //         this.column2 = savedData.column2;
+    //         this.column3 = savedData.column3;
+    //         this.column1Locked = savedData.column1Locked;
+    //         this.column2Full1 =  savedData.column2Full1;
+    //     }
+    // },
     methods: {
         addCard() {
             if (!this.newCardTitle) {
@@ -24,16 +34,18 @@ new Vue({
                 return;
             }
             if (this.newCardTitle.trim() !== '') {
-                if (this.progressTasksFull) {
+                if (this.column2Full1) {
                     alert("Нельзя добавить более 5 карточек во второй список");
                     return;
                 }
+
                 const filledItems = this.newCardItems.filter(item => item.text.trim() !== '');
                 if (filledItems.length < 3) {
-                    alert('Количество списков должно быть в диапазоне от 3 до 5');
+                    alert("Количество списков должно быть в диапазоне от 3 до 5");
                     return;
                 }
-                if (!this.plannedTasksLock && this.plannedTasks.length < 3) {
+
+                if (!this.column1Locked && this.plannedTasks.length < 3) {
                     this.plannedTasks.push({
                         title: this.newCardTitle,
                         items: filledItems
@@ -43,20 +55,23 @@ new Vue({
                     return;
                 }
                 this.newCardTitle = '';
-                this.newCardItems = [{ text: '' }, { text: '' }, { text: '' }, { text: '' }, { text: '' }];
+                this.newCardItems = [
+                    { text: '' },
+                    { text: '' },
+                    { text: '' },
+                    { text: '' },
+                    { text: '' }
+                ];
                 if (this.progressTasks.length < 5) {
-                    this.plannedTasksLock = false;
+                    this.column1Locked = false;
                 }
             }
         },
-        removeTask(card) {
-            this.plannedTasks.splice(card, 1);
-        },
         checkItem(card) {
-            if (this.plannedTasksLock) {
+            if (this.column1Locked) {
                 return;
             }
-            this.progressTasksFull = false;
+            this.column2Full1 = false;
             const checkedCount = card.items.filter(item => item.checked).length;
             const totalCount = card.items.length;
             const completionPercentage = (checkedCount / totalCount) * 100;
@@ -65,27 +80,26 @@ new Vue({
                 if (this.progressTasks.length < 5) {
                     this.moveCardToSecondColumn(card);
                 } else {
-                    this.progressTasksFull = true;
+                    this.column2Full1 = true;
                     alert("Нельзя добавить более 5 карточек во второй список");
                     return;
                 }
             }
-            if (this.plannedTasksLock && this.progressTasks.length === 5 && completionPercentage >= 50) {
-                this.progressTasksFull = true;
+            if (this.column1Locked && this.progressTasks.length === 5 && completionPercentage >= 50) {
+                this.column2Full1 = true;
             }
             if (completionPercentage >= 50 && this.plannedTasks.includes(card)) {
-                this.plannedTasksLock = true;
+                this.column1Locked = true;
             }
             if (completionPercentage < 50 && this.progressTasks.includes(card) && this.plannedTasks.length < 3) {
-                this.plannedTasksLock = false;
+                this.column1Locked = false;
             }
-            if (this.progressTasksFull === false && this.progressTasks.length < 5 && this.progressTasksFull && this.plannedTasks.includes(card)) {
+            if (this.column2Full1 === false && this.progressTasks.length < 5 && this.column2Full1 && this.plannedTasks.includes(card)) {
                 this.moveCardToSecondColumn(card);
             }
-            if (!this.progressTasksFull) {
+            if (!this.column2Full1) {
                 this.checkAndMoveCards();
             }
-
             if (completionPercentage >= 50 && this.completedTasks.includes(card)) {
                 if (this.progressTasks.length < 5) {
                     const index = this.completedTasks.indexOf(card);
@@ -97,7 +111,7 @@ new Vue({
                 }
             }
             if (completionPercentage < 50 && this.progressTasks.includes(card) && this.plannedTasks.length < 3){
-                const index1 = this.progressTasks.indexOf(card);
+                const index1 = this.column2.indexOf(card);
                 this.progressTasks.splice(index1, 1);
                 this.plannedTasks.push(card);
             }
@@ -142,9 +156,10 @@ new Vue({
             }
         },
         updateItemText(card, item, newText) {
-            if (this.plannedTasksLock) {
+            if (this.column1Locked) {
                 return;
             }
+
             item.text = newText;
         },
         saveData() {
